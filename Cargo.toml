@@ -1,0 +1,12 @@
+[package]
+name = "ducohasher"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ducohasher"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { git = "https://github.com/pyo3/pyo3", features = ["abi3-py37"] }
+sha1 = "0.6.0"
