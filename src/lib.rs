@@ -15,7 +15,7 @@ impl DUCOHasher {
         Self {hasher: Sha1::from(data)}
     }
 
-    #[warn(non_snake_case)] // recommend changing (needs to be changed in miners, too)
+    #[allow(non_snake_case)] // recommend changing (needs to be changed in miners, too)
     pub fn DUCOS1(&mut self, expected_hash: &[u8], diff: u128, eff: u64) -> u128 {
         for nonce in 0..(100*diff+1) {
             let mut temp_hasher = self.hasher.clone();
