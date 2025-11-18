@@ -1,0 +1,2 @@
+[build.env]
+passthrough = ["PYO3_NO_PYTHON"]
