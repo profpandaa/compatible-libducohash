@@ -1,6 +1,9 @@
+use std::hash::Hash;
 use pyo3::prelude::*;
-use sha1::Sha1;
 use std::time::Duration;
+use sha1::{Digest, Sha1};
+use sha1::digest::{DynDigest, Update};
+// use sha1_smol::Sha1;
 
 #[pyclass]
 #[derive(Clone)]
@@ -12,30 +15,48 @@ struct DUCOHasher {
 impl DUCOHasher {
     #[new]
     pub fn new(data: &[u8]) -> Self {
-        Self {hasher: Sha1::from(data)}
+        // Self {hasher: Sha1::from(data)}
+        Self {hasher: Sha1::new_with_prefix(data)}
     }
 
-    #[warn(non_snake_case)] // recommend changing (needs to be changed in miners, too)
+    #[allow(non_snake_case)] // recommend changing (needs to be changed in miners, too)
     pub fn DUCOS1(&mut self, expected_hash: &[u8], diff: u128, eff: u64) -> u128 {
-        for nonce in 0..(100*diff+1) {
-            let mut temp_hasher = self.hasher.clone();
+        let mut buffer = itoa::Buffer::new();
 
-            temp_hasher.update(nonce.to_string().as_bytes());
-            let result = temp_hasher.digest().bytes();
+        if eff != 0 // this really is a micro-optimization
+        {
+            for nonce in 0..(100*diff+1) {
+                let mut temp_hasher = self.hasher.clone();
 
-            if eff != 0 {
+                let str = buffer.format(nonce);
+                DynDigest::update(&mut temp_hasher, str.as_bytes());
+
+
                 if nonce % 5000 == 0 {
                     std::thread::sleep(Duration::new(eff/100, 0))
                 }
-            }
+                if temp_hasher.finalize().as_slice() == expected_hash {
+                    return nonce;
+                }
 
-            if result == expected_hash {
-                self.hasher.reset();
-                return nonce;
             }
-            
         }
-        return 0;
+        else
+        {
+
+            for nonce in 0..(100*diff+1) {
+                let mut temp_hasher = self.hasher.clone();
+
+                let str = buffer.format(nonce);
+                DynDigest::update(&mut temp_hasher, str.as_bytes());
+
+                if temp_hasher.finalize().as_slice() == expected_hash {
+                    return nonce;
+                }
+
+            }
+        }
+        0
     }
 
 }
