@@ -1,5 +1,5 @@
-use std::hash::Hash;
 use pyo3::prelude::*;
+use sha1::Sha1;
 use std::time::Duration;
 use sha1::{Digest, Sha1};
 use sha1::digest::{DynDigest, Update};
