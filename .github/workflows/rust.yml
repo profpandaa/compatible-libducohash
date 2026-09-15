@@ -1,0 +1,54 @@
+name: Rust
+
+on:
+  push:
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  release:
+    name: Release - ${{ matrix.platform.os-name }}
+    strategy:
+      matrix:
+        platform:
+          - os-name: Linux-aarch64 gnu
+            runs-on: ubuntu-24.04
+            target: aarch64-unknown-linux-gnu
+
+          - os-name: Linux-x86_64 gnu
+            runs-on: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            
+          - os-name: Windows-x64
+            runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+            
+          - os-name: Linux-armv7
+            runs-on: ubuntu-24.04
+            target: armv7-unknown-linux-gnueabi
+
+          - os-name: Linux-armv7-hf
+            runs-on: ubuntu-24.04
+            target: armv7-unknown-linux-gnueabihf
+
+
+    runs-on: ${{ matrix.platform.runs-on }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v1
+        with:
+          command: build
+          target: ${{ matrix.platform.target }}
+          args: "--release"
+          strip: true
+      - name: Publish artifacts and release
+        uses: houseabsolute/actions-rust-release@v0
+        with:
+          executable-name: duco-pool-rs
+          target: ${{ matrix.platform.target }}
+          changes-file: ""
+          extra-files: ""
