@@ -9,6 +9,8 @@ env:
   CARGO_TERM_COLOR: always
 jobs:
   release:
+    permissions:
+      contents: write
     name: Release - ${{ matrix.platform.os-name }}
     strategy:
       matrix:
@@ -55,8 +57,17 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: "--release"
           strip: true
+      - name: Stage library
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p dist
+          cp "target/${{ matrix.platform.target }}/release/${{ matrix.platform.source }}" \
+             "dist/${{ matrix.platform.asset }}"
+             
       - name: Publish GitHub release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/${{ matrix.platform.asset }}
+          files: ${{ github.workspace }}/dist/${{ matrix.platform.asset }}
+          fail_on_unmatched_files: true
           generate_release_notes: false
