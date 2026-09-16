@@ -13,25 +13,35 @@ jobs:
     strategy:
       matrix:
         platform:
-          - os-name: Linux-aarch64 gnu
+          - os-name: Linux-aarch64-gnu
             runs-on: ubuntu-24.04
             target: aarch64-unknown-linux-gnu
+            source: libducohasher.so
+            asset: libducohasher-linux-aarch64.so
 
-          - os-name: Linux-x86_64 gnu
+          - os-name: Linux-x86_64-gnu
             runs-on: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
-            
-          - os-name: Windows-x64
+            source: libducohasher.so
+            asset: libducohasher-linux-x86_64.so
+
+          - os-name: Windows-x86_64
             runs-on: windows-latest
             target: x86_64-pc-windows-msvc
-            
+            source: ducohasher.dll
+            asset: libducohasher-windows-x86_64.dll
+
           - os-name: Linux-armv7
             runs-on: ubuntu-24.04
             target: armv7-unknown-linux-gnueabi
+            source: libducohasher.so
+            asset: libducohasher-linux-armv7.so
 
           - os-name: Linux-armv7-hf
             runs-on: ubuntu-24.04
             target: armv7-unknown-linux-gnueabihf
+            source: libducohasher.so
+            asset: libducohasher-linux-armv7-hf.so
 
 
     runs-on: ${{ matrix.platform.runs-on }}
@@ -45,10 +55,8 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: "--release"
           strip: true
-      - name: Publish artifacts and release
-        uses: houseabsolute/actions-rust-release@v0
+      - name: Publish GitHub release asset
+        uses: softprops/action-gh-release@v2
         with:
-          executable-name: libducohasher
-          target: ${{ matrix.platform.target }}
-          changes-file: ""
-          extra-files: ""
+          files: dist/${{ matrix.platform.asset }}
+          generate_release_notes: false
