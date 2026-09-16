@@ -14,7 +14,7 @@ opt-level = 3
 
 [dependencies]
 itoa = "1.0.15"
-pyo3 = { git = "https://github.com/pyo3/pyo3", features = ["abi3-py37", "generate-import-lib", "extension-module"] }
+pyo3 = { git = "https://github.com/pyo3/pyo3", features = ["abi3-py39", "generate-import-lib", "extension-module"] }
 sha1 = { version = "0.10.7"}
 
 #[profile.release]
