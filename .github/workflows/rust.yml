@@ -48,7 +48,7 @@ jobs:
       - name: Publish artifacts and release
         uses: houseabsolute/actions-rust-release@v0
         with:
-          executable-name: duco-pool-rs
+          executable-name: libducohasher
           target: ${{ matrix.platform.target }}
           changes-file: ""
           extra-files: ""
